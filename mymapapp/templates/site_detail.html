@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ja">
+    <head>
+        <meta charset='UTF-8'>
+        <meta name="description" content="mymap共有サイト">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100;400&display=swap" rel="stylesheet">
+        <link rel = 'stylesheet' type="text/css" href = "{% static 'site_detail.css' %}">
+        <meta name="viewport" content="width=device-width">
+    </head>
+
+
+
+
+
+    <body>
+        <header>
+            <div class="container_head_button0">
+                <div class="container_head_button1">
+                    <a  class="sitehome lightgray" href="{%url 'main_app:site_list' %}">MAP HUB</a>
+                    <a class="login" href="{%url 'main_app:user_detail' %}">アカウント</a><br>
+                    <a class="login" href="{%url 'accounts:login' %}">ログイン</a><br>
+                </div>
+            </div>
+    
+            <div class="container_title_like">
+                <div class="container_title" >
+                    {%if site.icon_image %}<img class="icon_image relation_top20" src="{{site.icon_image.url}}" >{%else%}<p class="icon_image">oωo</p>{%endif%}
+                    <h3 class="item_title one_line_text ">{{site.title}}</h3>
+                    <a href="{%url 'main_app:liketosite'  sitepk=site.pk%}" class="like1">{%if like_flag %}♥いいね解除{%else%}♡いいねする{%endif%}</a>
+                </div>
+                <div class="edit_delete_btn">
+                    {%if request.user in site.member.all %}
+                    <a class="item_edit lightgray T14px" href="{%url 'main_app:site_update' sitepk=sitepk%}">編集</a>
+                    {%endif%}
+                </div>
+            </div>
+
+
+            <div class="resizer"  id="resizer">
+                <div class="handle" id="handle"></div>
+            </div>
+        </header>
+
+       <main_body>
+        {%if like_flag %}<a href="{%url 'main_app:liketosite'  sitepk=site.pk%}" class="like2-1">♥</a>{%else%}<a href="{%url 'main_app:liketosite'  sitepk=site.pk%}" class="like2-2">♡</a>{%endif%}
+        <div class="left">
+                <iframe id="map-iframe" src="https://www.google.com/maps/{{ map.id1 }}embed?mid={{ map.id2 }}&ehbc={{ map.id3 }}"  width="100%" height="100%"></iframe>
+        </div>
+
+
+        <div class="right">
+
+                    
+                    {% for content in site.get_contents %}
+                    
+                        {%if request.user in site.member.all %}
+                        <div id='popup{{content.pk}}' class="popup" style="visibility: hidden; " onclick="ClosePopup(event, 'show-btn{{content.pk}}', 'popup{{content.pk}}')">
+                            <div id="popup-inner{{content.pk}}" class="popup-inner" >
+                                <a href="{%url 'main_app:content_create'  sitepk=site.pk genreNum=0 insertNum=content.pk%}" class="content_create">・タイトル </a><br>
+                                <a href="{%url 'main_app:content_create'  sitepk=site.pk genreNum=1 insertNum=content.pk%}" class="content_create">・テキスト </a><br>
+                                <a href="{%url 'main_app:content_create'  sitepk=site.pk genreNum=2 insertNum=content.pk%}" class="content_create">・トグルリスト</a><br>
+                            </div><!-- .popup-inner -->
+                        </div><!-- #popup -->
+                        <div id="show-btn{{content.pk}}" class="btn" onclick="CreateContent(event, 'show-btn{{content.pk}}','popup-inner{{content.pk}}', 'popup{{content.pk}}');">+</div>
+
+                        
+                        <script>
+                            function CreateContent(event, id1, id2, id3){
+                                var show_btn1 = document.getElementById(id1);
+                                var popup_inner = document.getElementById(id2);
+                                var popup = document.getElementById(id3);
+                                var rect  = popup.getBoundingClientRect();
+                                var px = event.pageX;  //クリックX
+                                var py = event.pageY;  //クリックY
+                                var ox = window.pageXOffset;  //スクロールX
+                                var oy = window.pageYOffset;  //スクロールY
+                                var obj = document.elementFromPoint(px - ox, py - oy);  //object
+                                var objX = obj.getBoundingClientRect().left;  //objectのX
+                                var objY = obj.getBoundingClientRect().top;   //objectのY
+                                var width = popup_inner.getBoundingClientRect().width;
+                                var height = popup_inner.getBoundingClientRect().height;
+    
+                                if (popup.style.visibility === 'hidden') {
+                                    popup.style.visibility= 'visible';
+                                    popup.style.opacity= '1';
+                                    popup_inner.style.left = `${objX + width/2}px`; // objXとwidthを足した値を設定
+                                    popup_inner.style.top = `${objY + height/2 +25}px`;
+                                    show_btn1.textContent = ''
+                                }
+                            }
+    
+                            function ClosePopup(event, id1, id2){
+                                var show_btn1 = document.getElementById(id1);
+                                var popup = document.getElementById(id2);
+                                if(popup.style.visibility === 'visible') {
+                                    popup.style.visibility = 'hidden'
+                                    popup.style.opacity= '0';
+                                    show_btn1.textContent = '+'
+                                }
+                            }
+                            </script> 
+                        {%endif%}
+
+
+
+                        <div class="container_content_edit_delete swipe-item">
+                            <div class="content">
+
+                                {%if content.genre_number == 0%}
+                                    <div class="c0">
+                                        {%if content.title%}<p class="c0_text1 c0_{{content.ver}}">{{content.title}}</p>{%endif%}
+                                    </div>
+                                {%endif%}
+                                {%if content.genre_number == 1%}
+                                    <div class="c1" >
+                                        {%if content.text1%}<p class="c0_text1 c0_{{content.ver}}">{{content.text1}}</p>{%endif%}
+                                    </div>
+                                {%endif%}
+                                {%if content.genre_number == 2%}
+                                    <div class="c2">
+                                        <details>
+                                            <summary class="c2_title">{%if content.title%}{{content.title}}{%endif%}</summary>
+                                            {%if content.text1%}<p class="c2_text">{{content.text1}}</p>{%endif%}                                      
+                                        </details>
+                                    </div>
+                                {%endif%}
+
+                            </div>
+
+
+                            {%if request.user in site.member.all %}
+                            <div class="update_delete_btn">
+                                <a href="{%url 'main_app:content_update' contentpk=content.pk genreNum=content.genre_number%}" class="lightgray T14px edit">編集</a>
+                            </div>
+
+
+                            <script>
+                                var swipeItems = document.querySelectorAll('.swipe-item');
+
+                                swipeItems.forEach(item => {
+                                let startX;
+                                let isSwiping = false;
+                                let distance = 0;
+
+                                item.addEventListener('touchstart', e => {
+                                    startX = e.touches[0].clientX;
+                                    isSwiping = false;
+                                });
+
+                                item.addEventListener('touchmove', e => {
+                                    distance = e.touches[0].clientX - startX;
+                                    if (distance < 0 && Math.abs(distance) > 20 && Math.abs(distance) < window.innerWidth && window.innerWidth <= 500) {
+                                    isSwiping = true;
+                                    item.style.transform = `translateX(${distance}px)`;
+                                    }
+                                });
+
+
+                                
+                                item.addEventListener('touchend', e => {
+                                    
+                                    if (isSwiping && distance > -200 ) {
+                                    item.style.transform = ''; // スワイプをリセット
+                                    isSwiping = false;
+                                    distance = 0;
+                                    }
+                                });
+
+                                document.addEventListener('mousedown', e => {
+                                    const touchedElement = e.target;
+                                    if ( !touchedElement.classList.contains('edit') && !touchedElement.classList.contains('delete')) {
+                                        item.style.transform = ''; // スワイプをリセット
+                                        isSwiping = false;
+                                        distance = 0;
+                                    }
+
+                                });
+
+                                });
+                            </script>
+                            {%endif%}
+                        </div>
+                        
+                       
+
+                    {%endfor%}
+
+                    {%if request.user in site.member.all %}
+                    <div id='last_popup' class="popup" style="visibility: hidden; ">
+                        <div id="popup-inner" class="popup-inner">
+                                <a href="{%url 'main_app:lastcontent_create' sitepk=site.pk genreNum=0 %}" class="content_create">・タイトル </a><br>
+                                <a href="{%url 'main_app:lastcontent_create' sitepk=site.pk genreNum=1 %}" class="content_create">・テキスト </a><br>
+                                <a href="{%url 'main_app:lastcontent_create' sitepk=site.pk genreNum=2 %}" class="content_create">・トグルリスト </a><br>
+                        </div><!-- .popup-inner -->
+                    </div><!-- #popup -->
+                    <div id="show-btn" class="last_btn" >+</div>
+
+                    <script>
+                        var show_btn = document.getElementById('show-btn');
+                        var last_popup = document.getElementById('last_popup');
+
+                        show_btn.onclick = function(event){
+                            var popup_inner = document.getElementById('popup-inner');
+                            var rect  = last_popup.getBoundingClientRect();
+                            var px = event.pageX;  //クリックX
+                            var py = event.pageY;  //クリックY
+                            var ox = window.pageXOffset;  //スクロールX
+                            var oy = window.pageYOffset;  //スクロールY
+                            var obj = document.elementFromPoint(px - ox, py - oy);  //object
+                            var objX = obj.getBoundingClientRect().left;  //objectのX
+                            var objY = obj.getBoundingClientRect().top;   //objectのY
+                            var width = popup_inner.getBoundingClientRect().width;
+                            var height = popup_inner.getBoundingClientRect().height;
+
+                            if (last_popup.style.visibility === 'hidden') {
+                                last_popup.style.visibility= 'visible';
+                                last_popup.style.opacity= '1';
+                                popup_inner.style.left = `${objX + width/2}px`; // objXとwidthを足した値を設定
+                                popup_inner.style.top = `${objY + height/2 +25}px`;
+                                show_btn.textContent = ''
+                            }
+                        }
+
+                        last_popup.onclick = function(event){
+                            if(last_popup.style.visibility === 'visible') {
+                                last_popup.style.visibility = 'hidden'
+                                last_popup.style.opacity= '0';
+                                show_btn.textContent = '+'
+                            }
+                        }
+                        </script>
+                    
+                    {%endif%}
+                    <div class="blank"></div>
+        </div>
+
+
+        <script>
+            var handle = document.getElementById('handle');
+            var handle2 = document.getElementById('handle2');
+            var left = document.querySelector('.left');
+            var right = document.querySelector('.right');
+            let isResizing = false;
+            let startX = 0;
+          
+            handle.addEventListener('mousedown', (e) => {
+              e.preventDefault();
+              isResizing = true;
+              startX = e.clientX;
+            });
+
+          
+            window.addEventListener('mousemove', (e) => {
+              if (isResizing) {
+                const windowWidth = window.innerWidth;
+                const diffX = e.clientX - startX;
+                const newWidth = left.offsetWidth + diffX;
+                const newRaito = newWidth / windowWidth;
+                left.style.width = `${newRaito*100}vw`;
+                right.style.width = `${(1 - newRaito)*100}vw`;
+                handle.style.left = `calc(${newRaito*100}vw - 21px)`;
+                startX = e.clientX;
+              }
+            });
+          
+            window.addEventListener('mouseup', () => {
+              isResizing = false;
+            });
+
+
+            var resize_flag = true;
+
+            function checkScreenWidth() {
+                
+                if (  resize_flag && window.innerWidth <= 767) {
+                    left.style.width = `100vw`;
+                    right.style.width = `100vw`;
+                    resize_flag = false;
+                    
+                }
+                if ( !resize_flag && 768 <= window.innerWidth) {
+                    left.style.width = `55vw`;
+                    right.style.width = `45vw`;
+                    handle.style.left = `calc(55vw - 10px)`;
+                    resize_flag = true;
+                }
+            }
+
+            window.addEventListener('resize', checkScreenWidth);
+
+          </script>
+
+
+          
+                   
+       </main_body>
+
+    </body>
+</html>
+
+
+<!--ページ更新を求められたらページ更新する-->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    if (localStorage.getItem('cameFromOtherPage')) {
+        window.location.reload(false);
+
+        localStorage.removeItem('cameFromOtherPage');
+    }
+    });
+  </script>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ja">
+    <head>
+        <meta charset='UTF-8'>
+        <title>COLLABO LIBRARY</title>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100;400&display=swap" rel="stylesheet">
+        <link rel = 'stylesheet' type="text/css" href = "{% static 'site_list.css' %}">
+        <meta name="viewport" content="width=device-width">
+        <script type="text/javascript" src="{% static 'base.js' %}"></script>
+    </head>
+
+
+
+
+
+    <body>
+
+
+        {%if top%}
+        <div class="container_head_button1-0">
+            <div class="container_head_button1-1">
+                <a class="login" href="{%url 'main_app:user_detail' %}">アカウント</a><br>
+                <a class="login" href="{%url 'accounts:login' %}">ログイン</a><br>
+            </div>
+        </div>
+
+
+
+        <div class="container_title">
+            <h1><a class="item_title" href="{%url 'main_app:site_list' %}">MAP HUB</a></h1>
+        </div>
+
+        <form action="" method="get">
+        <div class="container_search">
+            <form action="" method="get">
+                <input class="search" name="query" value="{{ request.GET.query }}" type="text">
+                <button class="button" type="submit"><span class="material-symbols-outlined lightgray">search</span></button>
+
+            </form>
+        </div>
+        </form>
+
+        <div ><a class="create_button1-1" href="{%url 'main_app:site_create'%}">＋新サイトの設立</a></div>
+        <div class="create_button1-2"><a class="create_text" href="{%url 'main_app:site_create'%}">＋</a></div>
+
+        
+        <div class="container_site_list1-0 ">
+            <div class="container_site_list1-1">
+                <h3 class="T14px lightgray" id="osusume">おすすめサイト</h3>
+                {%for site in site_list%}
+                    <div class="site_icon_title mairgin_top40">
+                        {%if site.icon_image %}<img class="icon_image " src="{{site.icon_image.url}}" >{%else%}<div class="icon_image">oωo</div>{%endif%}
+                        <div class="site_title_container"><a class="site_title gray T18px "  href="{%url 'main_app:site_detail' sitepk=site.pk%}">{{site}}</a></div>
+                    </div>
+                    <h3 class="T14px lightgray mairgin_top5" id="site_expla">{{site.explanation}}</h3>
+                {%endfor%}
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+        {%else%}
+        <div class="body_left">
+
+            <div class="container_title_head_button ">
+                <a class="item_title2 T24px brack" href="{%url 'main_app:site_list' %}">MAP HUB</a>
+                <div class="container_head_button2">
+                    <a class="login" href="{%url 'main_app:user_detail' %}">アカウント</a><br>
+                    <a class="login" href="{%url 'accounts:login' %}">ログイン</a><br>
+                </div>
+            </div>
+
+
+
+            <form action="" method="get">
+                    <div class="container_search2">
+                        <input class="search2" name="query" value="{{ request.GET.query }}" type="text">
+                        <button class="button2" type="submit"><span class="material-symbols-outlined lightgray">search</span></button>
+                    </div>
+            </form>
+            
+            <div style="padding: 5px 0 20px 0; "><a class="createbutton2-1 T14px gray" href="{%url 'main_app:site_create'%}">＋新サイトの設立</a></div>
+            <div class="createbutton2-2"><a class="create_text" href="{%url 'main_app:site_create'%}">＋</a></div>
+        </div>
+
+
+            
+            <div class="container_site_list2  mairgin_right5vw " id="my_site_list">
+                {%for site in site_list%}
+                <div class="item_site_list" >
+                    <div class="site_icon_title">
+                        {%if site.icon_image %}<img class="icon_image " src="{{site.icon_image.url}}" >{%else%}<div class="icon_image">oωo</div>{%endif%}
+                        <div class="site_title_container"><a class="site_title gray T18px "  href="{%url 'main_app:site_detail' sitepk=site.pk%}">{{site}}</a></div>
+                    </div>
+                    <h3 class="T14px lightgray mairgin_top5" id="site_expla">{{site.explanation}}</h3>
+                </div>
+                {%endfor%}
+            </div>
+
+            {%endif%}
+    
+    </body>
+
+    
+    <script>
+        window.onpageshow = function(event) {
+            if (window.performance.navigation.type==2) {
+                window.location.reload();
+            }
+            if (event.persisted) {
+                window.location.reload(false);
+        }
+        };
+    </script>
+
+</html>

@@ -1,0 +1,13 @@
+{%extends 'base.html'%}
+{%block title%} Registration Complete{%endblock%}
+{%block content%}
+<a href="{%url 'main_app:site_list' %}">MAP HUB</a><br>
+<div class="container">
+    <div class="row">
+        <div class="col offset-4 py-4">
+            <h3>登録完了しました</h3>
+            <p><a href='{%url 'accounts:login' %}'>ログイン</a></p>
+        </div>
+    </div>
+</div>
+{%endblock%}

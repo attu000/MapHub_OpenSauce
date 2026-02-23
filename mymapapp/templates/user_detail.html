@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ja">
+    <head>
+        <meta charset='UTF-8'>
+        <title>COLLABO LIBRARY</title>
+        <meta name="description" content="簡易的なウェブサイトを作ってTwitter風に運営するサイトです">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100;400&display=swap" rel="stylesheet">
+        <link rel = 'stylesheet' type="text/css" href = "{% static 'user_detail.css' %}">
+        <meta name="viewport" content="width=device-width">
+        <script type="text/javascript" src="{% static 'base.js' %}"></script>
+        
+    </head>
+
+
+
+
+
+    <body>
+        <div class="body_left">
+            <div class="container_title_head_button">
+                <a class="item_title2 T24px brack" href="{%url 'main_app:user_detail' %}">ACCOUNT</a>
+                <div class="container_head_button2">
+                    <a class="login" href="{%url 'main_app:site_list' %}">MAP HUB</a><br>
+                    <a class="login" href="{%url 'accounts:login' %}">ログイン</a><br>
+                </div>
+            </div>
+
+
+
+            <form action="" method="get">
+                    <div class="container_search2">
+                        <input class="search2" name="query" value="{{ request.GET.query }}" type="text">
+                        <button class="button2" type="submit"><span class="material-symbols-outlined lightgray">search</span></button>
+                    </div>
+            </form>
+            
+            <div style="padding: 5px 0 20px 0; "><a class="createbutton2-1 T14px gray" href="{%url 'main_app:site_create'%}">＋新サイトの設立</a></div>
+            <div class="createbutton2-2"><a class="create_text" href="{%url 'main_app:site_create'%}">＋</a></div>
+        </div>
+
+            <main_body>
+                <div class="container_list_title body_left">
+                    <h3 class="list_title_a  T14px back_gray" id="my_site_btn">自作マップ</h3>
+                    <h3 class="list_title_b  T14px" id="liked_site_btn">お気に入りマップ</h3>
+                </div>
+
+                <div class="container_site_list1-1  mairgin_right5vw " id="my_site_list">
+                    <h3 class="list_title1 lightgray T14px ">自作マップ</h3>
+                    {%for site in site_list%}
+                    <div class="item_site_list" >
+                        <div class="site_icon_title">
+                            {%if site.icon_image %}<img class="icon_image " src="{{site.icon_image.url}}" >{%else%}<div class="icon_image">oωo</div>{%endif%}
+                            <div class="site_title_container"><a class="site_title gray T18px "  href="{%url 'main_app:site_detail' sitepk=site.pk%}">{{site}}</a></div>
+                        </div>
+                        <h3 class="T14px lightgray mairgin_top5" id="site_expla">{{site.explanation}}</h3>
+                    </div>
+                    {%endfor%}
+                    <div class="blank"></div>
+                </div>
+
+
+
+                
+                <div class="container_site_list1-2 " id="liked_site_list">
+                    <h3 class="list_title2 lightgray T14px">お気に入りマップ</h3>
+                    {%for site in liked_list%}
+                    <div class="item_site_list" >
+                        <div class="site_icon_title">
+                            {%if site.icon_image %}<img class="icon_image " src="{{site.icon_image.url}}" >{%else%}<div class="icon_image">oωo</div>{%endif%}
+                            <div class="site_title_container"><a class="site_title gray T18px "  href="{%url 'main_app:site_detail' sitepk=site.pk%}">{{site}}</a></div>
+                        </div>
+                        <h3 class="T14px lightgray mairgin_top5" id="site_expla">{{site.explanation}}</h3>
+                    </div>
+                    {%endfor%}
+                    <div class="blank"></div>
+                </div>
+            </main_body>
+
+    </body>
+</html>
+
+
+
+
+<script>
+    var my_site_btn = document.getElementById('my_site_btn');
+    var liked_site_btn = document.getElementById('liked_site_btn');
+
+    my_site_btn.onclick = function(event) {
+        var my_site_list = document.getElementById('my_site_list');
+        var liked_site_list = document.getElementById('liked_site_list');
+
+        if (my_site_list.style.display === 'none' || my_site_list.style.display === '') {
+            my_site_list.style.display = 'block';
+            liked_site_list.style.display = 'none';
+            my_site_btn.style.color = '#777777'
+            liked_site_btn.style.color = '#aaaaaa'
+            my_site_btn.classList.add("back_gray");
+            liked_site_btn.classList.remove("back_gray");
+
+        } else {
+            // 既に表示されている場合の処理
+        }
+    };
+
+    liked_site_btn.onclick = function(event) {
+        var my_site_list = document.getElementById('my_site_list');
+        var liked_site_list = document.getElementById('liked_site_list');
+
+        if (liked_site_list.style.display === 'none' || liked_site_list.style.display === '') {
+            liked_site_list.style.display = 'block';
+            my_site_list.style.display = 'none';
+            my_site_btn.style.color = '#aaaaaa'
+            liked_site_btn.style.color = '#777777'
+            my_site_btn.classList.remove("back_gray");
+            liked_site_btn.classList.add("back_gray");
+        } else {
+            // 既に表示されている場合の処理
+        }
+    };
+
+    </script>
+

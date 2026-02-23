@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ja">
+    <head>
+        <meta charset='UTF-8'>
+        <meta name="description" content="mymap共有サイト">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100;400&display=swap" rel="stylesheet">
+        <link rel = 'stylesheet' type="text/css" href = "{% static 'delete.css' %}">
+        <meta name="viewport" content="width=device-width">
+    </head>
+
+
+    <form action="" method="POST" enctype="multipart/form-data" class="form">
+        <P class='alert' >本当に削除してもよろしいですか？一度削除したものは元には戻りません。</P>
+        {% csrf_token %}
+        <div class="container_delete">
+            <button type="submit" class="item_delete">削除</button>
+        </div>
+    </form>
+
+
+</html>

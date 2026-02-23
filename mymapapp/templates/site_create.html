@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ja">
+    <head>
+        <meta charset='UTF-8'>
+        <meta name="description" content="mymap共有サイト">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100;400&display=swap" rel="stylesheet">
+        <link rel = 'stylesheet' type="text/css" href = "{% static 'site_create.css' %}">
+        <meta name="viewport" content="width=device-width">
+    </head>
+
+
+    <form action="" method="POST" enctype="multipart/form-data">
+
+
+        {%csrf_token%}
+        <div class="form">
+            {% for field in form %}
+                <div class="field">
+                    <div style="display: flex;">
+                        <div class="label_tag">{{ field.label_tag }}</div>
+
+                        <!-- hint about map code -->
+                        {% if  'MAPソースコード' in field.label_tag  %} 
+                        <div id="show-btn" class="container_hintbtn"><p class="item_hintbtn">?</p></div>
+                        {%endif%}
+                        <div id='last_popup' class="popup" style="visibility: hidden; ">
+                            <div id="popup-inner" class="popup-inner">
+                                <div class="container_explanation">
+                                <h3 class="item_explanation1">MAPソースコードとは:</h3>
+                                    <p class="item_explanation1">MAPソースコードとはGoogleMyMapの<span style="color: #b27c2c;">「地図を埋め込む」</span>または<span style="color: #b27c2c;">「自分のサイトに埋め込む」</span>のボタンから得られるHTMLコードです。</p>
+                                    <br><hr><br>
+                                    <p class="item_explanation2">まず、マイマップを共有可能にします。<br>「共有ボタン」を押します</p>
+                                    <img src="/media/saved_image/スライド1.PNG" class="image"><br>
+                                    <br><hr><br>
+                                    <p class="item_explanation2">一番上のみをONにします。<br>それ以外はOFFにしてください。</p>
+                                    <img src="/media/saved_image/スライド2.PNG" class="image"><br>
+                                    <br><hr><br>
+                                    <p class="item_explanation2">次に題名横の「三点ボタン」を押してください</p>
+                                    <img src="/media/saved_image/スライド3.PNG" class="image"><br>
+                                    <br><hr><br>
+                                    <p class="item_explanation2">「自分のサイトに埋め込む」を押してください</p>
+                                    <img src="/media/saved_image/スライド4.PNG" class="image"><br>
+                                    <br><hr><br>
+                                    <p class="item_explanation2">表示されたHTMLコードがMAPソースコードです。<br>それを全てコピー＆ペーストしてください。</p>
+                                    <img src="/media/saved_image/スライド5.PNG" class="image">
+                                    <p class="item_explanation2">例↓</p>
+                                    <p style="color: blue; font-size: 14px;">&lt;iframe src="https://www.google.com/maps/d/u/0/embed?mid=1mduMhKdecqOZ05N6Rc9v-eQoCz_ndx8&ehbc=2E312F" width="640" height="480"&gt;&lt;/iframe&gt;</p><br><br>
+                                    
+                                </div>
+                            </div><!-- .popup-inner -->
+                        </div><!-- #popup -->
+                        
+                    </div>
+                    
+                    
+
+                    <script>
+                        var show_btn = document.getElementById('show-btn');
+                        var last_popup = document.getElementById('last_popup');
+
+                        show_btn.onclick = function(event){
+                            var popup_inner = document.getElementById('popup-inner');
+                            var rect  = last_popup.getBoundingClientRect();
+
+
+                            if (last_popup.style.visibility === 'hidden') {
+                                last_popup.style.visibility= 'visible';
+                                last_popup.style.opacity= '1';
+
+                            }
+                        }
+
+                        last_popup.onclick = function(event){
+                            if(last_popup.style.visibility === 'visible') {
+                                last_popup.style.visibility = 'hidden'
+                                last_popup.style.opacity= '0';
+                            }
+                        }
+                        </script>
+                    <!-- END hint about map code -->
+
+                    <div class="input">{{ field }}</div>
+                    <div class="errors" style="background-color: aqua;">{{ field.errors }}</div>
+                </div>
+            {% endfor %}
+            <div class="container_submit"><button type="submit" class="item_submit">送信</button></div>
+        </div>
+        
+    </form>
+    
+
+</html>

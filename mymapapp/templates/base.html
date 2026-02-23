@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ja">
+    <head>
+        <meta charset='UTF-8'>
+        <title>COLLABO LIBRARY</title>
+        <meta name="description" content="簡易的なウェブサイトを作ってTwitter風に運営するサイトです">
+        
+        <link rel = 'stylesheet' type="text/css" href = "{% static 'site_list.css' %}">
+        {%block header%}{%endblock%}
+        
+    </head>
+
+    <body>
+        
+
+            <p>{{request.user}} さんでログイン中</p>
+            <p><a href="#" onclick="history.back(); return false;">戻る</a></p>    
+            <a href="{%url 'main_app:site_list' %}">図書館一覧</a>
+            <a href="{%url 'accounts:logout' %}">ログアウト</a>
+
+            {%block content%}
+            {%endblock content%}
+        
+    </body>
+</html>
