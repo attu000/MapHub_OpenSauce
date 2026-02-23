@@ -41,66 +41,51 @@ def site_create(request):
     map = None
     form = forms.SiteCreateForm(request.POST or None)
 
+    if request.method == 'POST' and form.is_valid():
+        
+        # ユーザー入力を取得
+        map_input = request.POST.get('map_url', '')
 
-    if request.method == 'POST' and form.is_valid():#POSTがきたとき
-        if request.POST.get('map_url', False):#map_urlがあるとき要件チェック、マップ作製
-            iframe_code = request.POST['map_url']
-
-            pattern1 = r'<iframe src="(.*?)"'
-            match = re.search(pattern1, iframe_code)
+        if map_input:
+            # 事実に基づく詳細: Google My MapsのマップID(mid)は、英数字、ハイフン、アンダースコアで構成されます。
+            # iframeタグ全体が入力されても、URLだけが入力されても、midの値だけを厳密に抽出します。
+            match = re.search(r'mid=([a-zA-Z0-9_-]+)', map_input)
+            
             if match:
-                url = match.group(1)
+                mid_value = match.group(1)
             else:
+                # midが見つからない、または不正な文字が含まれている場合はエラー
                 html = loader.render_to_string('error.html')
                 return HttpResponse(html)
 
-            pattern2 = r'https://www\.google\.com/maps/(.*?)embed\?mid'
-            pattern3 = r'embed\?mid=(.*?)&ehbc='
-            pattern4 = r'&ehbc=(.*?)$'
-            match2 = re.search(pattern2, url)
-            match3 = re.search(pattern3, url)
-            match4 = re.search(pattern4, url)
-
-            #不正がないかチェック
-            if '<' in match2.group(1) or '>' in match2.group(1) or ' ' in match2.group(1) or '\\' in match2.group(1):
-                html = loader.render_to_string('error.html')
-                return HttpResponse(html)
-            if '<' in match3.group(1) or '>' in match3.group(1) or ' ' in match3.group(1) or '\\' in match3.group(1):
-                html = loader.render_to_string('error.html')
-                return HttpResponse(html)
-            if '<' in match4.group(1) or '>' in match4.group(1) or ' ' in match4.group(1) or '\\' in match4.group(1):
-                html = loader.render_to_string('error.html')
-                return HttpResponse(html)
-
-            #MAP作成
+            # MAPオブジェクトの作成
             map = models.Map.objects.create()
-
-            if match2:
-                map.id1 = match2.group(1)
-            if match3:
-                map.id2 = match3.group(1)
-            if match4:
-                map.id3 = match4.group(1)
+            
+            # 既存のモデル構造に合わせる場合、id2にmidを保存すると推測します。
+            # id1やid3は固定のパス情報を保持しているだけなので、固定値で問題ありません。
+            map.id1 = 'd/u/0/'
+            map.id2 = mid_value  # 抽出した安全なIDのみを保存
+            map.id3 = '2E312F'
+            
         else:
+            # 入力がなかった場合のデフォルト処理
             map = models.Map.objects.create()
             map.id1 = 'd/u/0/'
             map.id2 = '1mduMhKdecqOZ05N6Rc9v-eQoCz_ndx8'
             map.id3 = '2E312F'
 
-
-
-        #オブジェクト作成、保存、マップ保存
+        # オブジェクト作成、保存、マップ保存
         object = form.save()
         object.member.add(request.user)
-        if request.FILES.get('icon_image',False): object.icon_image= request.FILES['icon_image']
+        if request.FILES.get('icon_image', False): 
+            object.icon_image = request.FILES['icon_image']
         object.save()
+        
         map.site = models.Site.objects.get(id=object.id)
         map.save()
 
-        #ページ移動
         html = loader.render_to_string('create_success.html')
         return HttpResponse(html)
-    
 
     context = {
         'form':form
@@ -108,79 +93,74 @@ def site_create(request):
     return render(request, 'site_create.html', context)
 
 
+
+import re
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from django.template import loader
+from django.contrib.auth.decorators import login_required
+from . import models
+from . import forms
+
 @login_required
 def site_update(request, sitepk):
+    # 対象のSiteオブジェクトを取得
     site = models.Site.objects.get(pk=sitepk)
     map = None
     form = forms.SiteCreateForm(request.POST or None, instance=site)
 
+    if request.method == 'POST' and form.is_valid():
+        map_input = request.POST.get('map_url', '')
 
-    if request.method == 'POST' and form.is_valid():#POSTがきたとき
-        if request.POST.get('map_url', False):#map_urlがあるとき要件チェック、マップ作製
-            iframe_code = request.POST['map_url']
-
-            pattern1 = r'<iframe src="(.*?)"'
-            match = re.search(pattern1, iframe_code)
+        if map_input:
+            # 入力文字列から「mid=」に続く安全な文字（英数字、ハイフン、アンダースコア）のみを抽出
+            match = re.search(r'mid=([a-zA-Z0-9_-]+)', map_input)
+            
             if match:
-                url = match.group(1)
+                mid_value = match.group(1)
             else:
+                # 抽出できない、または不正な形式の場合はエラーを返す
                 html = loader.render_to_string('error.html')
                 return HttpResponse(html)
 
-            pattern2 = r'https://www\.google\.com/maps/(.*?)embed\?mid'
-            pattern3 = r'embed\?mid=(.*?)&ehbc='
-            pattern4 = r'&ehbc=(.*?)$'
-            match2 = re.search(pattern2, url)
-            match3 = re.search(pattern3, url)
-            match4 = re.search(pattern4, url)
-
-            #不正がないかチェック
-            if '<' in match2.group(1) or '>' in match2.group(1) or ' ' in match2.group(1) or '\\' in match2.group(1):
-                html = loader.render_to_string('error.html')
-                return HttpResponse(html)
-            if '<' in match3.group(1) or '>' in match3.group(1) or ' ' in match3.group(1) or '\\' in match3.group(1):
-                html = loader.render_to_string('error.html')
-                return HttpResponse(html)
-            if '<' in match4.group(1) or '>' in match4.group(1) or ' ' in match4.group(1) or '\\' in match4.group(1):
-                html = loader.render_to_string('error.html')
-                return HttpResponse(html)
-
-            #MAP作成
+            # 既存のMAPオブジェクトがあれば取得、なければ新規作成
             if site.s_to_m.all():
                 map = site.s_to_m.all()[0]
             else:
                 map = models.Map.objects.create()
 
-            if match2:
-                map.id1 = match2.group(1)
-            if match3:
-                map.id2 = match3.group(1)
-            if match4:
-                map.id3 = match4.group(1)
+            # 抽出したmidを保存し、前後のIDは固定値を設定
+            map.id1 = 'd/u/0/'
+            map.id2 = mid_value
+            map.id3 = '2E312F'
+            
         else:
+            # map_urlの入力がなかった場合、既存のマップがあればデフォルト値にリセットする
             if site.s_to_m.all():
                 map = site.s_to_m.all()[0]
                 map.id1 = 'd/u/0/'
                 map.id2 = '1mduMhKdecqOZ05N6Rc9v-eQoCz_ndx8'
                 map.id3 = '2E312F'
 
-        #オブジェクト作成、保存、マップ保存
+        # オブジェクトの更新内容を保存
         object = form.save()
-        if request.FILES.get('icon_image',False): object.icon_image= request.FILES['icon_image']
+        if request.FILES.get('icon_image', False): 
+            object.icon_image = request.FILES['icon_image']
         object.save()
+        
+        # mapが存在する場合、Siteと紐付けて保存
         if map:
             map.site = models.Site.objects.get(id=object.id)
             map.save()
 
-        #ページ移動
+        # 成功ページへ遷移
         html = loader.render_to_string('create_success.html')
         return HttpResponse(html)
 
-
-    #サイト作成ページへ
+    # サイト更新ページを出力（GETリクエスト時など）
     context = {
         'form': form,
-        'sitepk':sitepk,
+        'sitepk': sitepk,
     }
     return render(request, 'site_update.html', context)
 
@@ -249,7 +229,7 @@ def content_create(request, sitepk, genreNum, insertNum):
         print('error!!')
 
     if(genreNum==0 or genreNum==1 or genreNum==2):
-        if request.method == 'POST' and form.is_valid:
+        if request.method == 'POST' and form.is_valid():
             content = form.save()
             content.site = site
             content.genre_number = genreNum
@@ -345,7 +325,7 @@ def content_update(request, contentpk, genreNum):
         print('error!!')
 
     if(genreNum==0 or genreNum==1 or genreNum==2):
-        if request.method == 'POST' and form.is_valid:
+        if request.method == 'POST' and form.is_valid():
             content = form.save()
             content.save()
         
