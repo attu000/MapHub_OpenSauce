@@ -1,4 +1,6 @@
 # MapHub
+https://maphub-347e00702c92.herokuapp.com/maphub/
+
 
 Googleマップ埋め込み付きの「サイト（スポット）情報」を投稿・管理できる Django アプリです。  
 ユーザー登録/ログイン、サイト作成、コンテンツ追加、いいね機能を備えています。
